@@ -1,0 +1,12 @@
+{
+    "cSpell.language": "en, pt-BR",
+    "licenser.author": "A Comunidade",
+    "licenser.license": "MIT",
+    "licenser.projectName": "Campos vetoriais aplicados",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.tabWidth": 4,
+    "cSpell.words": ["venv"],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    }
+}
