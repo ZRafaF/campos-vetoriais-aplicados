@@ -3,7 +3,6 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import netCDF4 as nc
-import numpy as np
 from typing import List
 from typing import Tuple
 from tqdm import tqdm
@@ -13,7 +12,11 @@ class FormattedData:
     def __init__(self, lat: float, lon: float, u10: float, v10: float):
         self.lat = lat
         self.lon = lon
+
+        # Componente do vento horizontal em m/s
         self.u10 = u10
+
+        # Componente do vento vertical em m/s
         self.v10 = v10
 
 

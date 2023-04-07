@@ -2,4 +2,3 @@ black
 matplotlib
 netCDF4
 tqdm
-numpy
