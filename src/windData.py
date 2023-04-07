@@ -3,8 +3,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import netCDF4 as nc
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 from tqdm import tqdm
 
 
@@ -55,7 +54,7 @@ def get_u10_list() -> List[float]:
 
 
 # Retorna uma lista de objetos do tipo FormattedData
-def format_dataset():
+def get_formatted_dataset() -> List[FormattedData]:
     print("Formatando o dataset...")
 
     u10_list = get_u10_list()
@@ -76,11 +75,7 @@ def format_dataset():
     return formatted_list
 
 
-def get_formatted_dataset() -> List[FormattedData]:
-    return formatted_dataset
-
-
-def print_dataset() -> None:
+def print_dataset(formatted_dataset: List[FormattedData]) -> None:
     for i in formatted_dataset:
         print("lat: ", i.lat, " lon: ", i.lon, " u10: ", i.u10, " v10: ", i.v10)
 
@@ -105,7 +100,6 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
 
     # Checando latitude
     for idx, lat in enumerate(get_latitude_list()):
-        print(get_latitude_list()[idx])
         if get_latitude_list()[idx] == closest_lat:
             lat_idx = idx
             break
@@ -119,7 +113,21 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     return (lat_idx, lon_idx)
 
 
-DATA_SET_HAS_BEEN_MADE = False
+# Retorna os valores de vento de uma determinada posição
+def get_wind_at(lat: float, lon: float) -> Tuple[float, float]:
+    idx_lat, idx_lon = get_nearest_point_index(lat, lon)
+    if idx_lat == -1 or idx_lon == -1:
+        raise ValueError(
+            "Posição lat: ",
+            lat,
+            " lon: ",
+            lon,
+            " está fora dos limites de dados",
+            DATA_RANGE,
+        )
+
+    return (get_u10_list()[idx_lat][idx_lon], get_v10_list()[idx_lat][idx_lon])
+
 
 # Caminho para o dataset
 DATASET_PATH = "data/data.nc"
@@ -128,6 +136,3 @@ DATASET_PATH = "data/data.nc"
 DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
 
 dataset = load_data_set()
-
-
-formatted_dataset = format_dataset()
