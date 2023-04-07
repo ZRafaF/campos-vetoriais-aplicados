@@ -1,6 +1,7 @@
 import netCDF4 as nc
 from typing import List
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 
 class FormattedData:
@@ -80,3 +81,5 @@ DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
 
 dataset = load_data_set()
 formatted_dataset = get_formatted_dataset()
+plt.show()
+
