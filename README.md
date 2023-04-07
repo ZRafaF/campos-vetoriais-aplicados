@@ -17,3 +17,6 @@ Inicie o *virtual environment*
 
 ## Dependências
 Para instalar as dependências `pip install -r requirements.txt`
+
+## Executar
+Para executar o arquivo inicie o *shell script* `./run.sh`
