@@ -35,5 +35,5 @@ def load_config_file():
 
 if __name__ == "__main__":
     load_config_file()
-    wd.print_dataset()
+    # wd.print_dataset()
     input("Aperte enter para encerrar...")
