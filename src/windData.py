@@ -3,8 +3,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import netCDF4 as nc
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 from tqdm import tqdm
 
 
@@ -20,42 +19,44 @@ class FormattedData:
         self.v10 = v10
 
 
-# Carrega o dataset de um arquivo
 def load_data_set() -> List[float]:
+    """Carrega o dataset de um arquivo"""
     return nc.Dataset(DATASET_PATH)
 
 
-# Retorna as variáveis presentes no dataset
 def get_variables() -> List[float]:
+    """Retorna as variáveis presentes no dataset"""
     return dataset.variables
 
 
 def get_keys():
+    """Retorna os tipos de dados disponíveis no dataset"""
     return dataset.variables.keys()
 
 
-# Retorna um iterador das latitudes
 def get_latitude_list() -> List[float]:
+    """Retorna um iterador das latitudes"""
     return dataset.variables["latitude"][:]
 
 
-# Retorna um iterador das longitudes
 def get_longitude_list() -> List[float]:
+    """Retorna um iterador das longitudes"""
     return dataset.variables["longitude"][:]
 
 
-# Retorna um iterador da velocidade do vento no componente v "latitudinal"
 def get_v10_list() -> List[float]:
+    """Retorna um iterador da velocidade do vento no componente v 'latitudinal'"""
     return dataset.variables["v10"][0]
 
 
-# Retorna um iterador da velocidade do vento no componente u "longitudinal"
 def get_u10_list() -> List[float]:
+    """Retorna um iterador da velocidade do vento no componente u 'longitudinal'"""
     return dataset.variables["u10"][0]
 
 
-# Retorna uma lista de objetos do tipo FormattedData
-def format_dataset():
+def get_formatted_dataset() -> List[FormattedData]:
+    """Retorna uma lista de objetos do tipo FormattedData"""
+
     print("Formatando o dataset...")
 
     u10_list = get_u10_list()
@@ -76,22 +77,24 @@ def format_dataset():
     return formatted_list
 
 
-def get_formatted_dataset() -> List[FormattedData]:
-    return formatted_dataset
-
-
-def print_dataset() -> None:
+def print_dataset(formatted_dataset: List[FormattedData]) -> None:
+    """Recebe uma lista de dados formatados 'List[FormattedData]' e os imprime na tela"""
     for i in formatted_dataset:
         print("lat: ", i.lat, " lon: ", i.lon, " u10: ", i.u10, " v10: ", i.v10)
 
 
-# Retorna o numero mais próximo a cada 0.25
 def __round_num(num: float) -> float:
+    """Retorna o numero mais próximo a cada 0.25"""
     remaining = num % 0.25
     return num - remaining
 
 
 def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
+    """
+    Retorna uma Tuple dos índices dos pontos mais próximos
+
+    Retorna (-1,-1) caso a posição fornecida seja inválida
+    """
     lat_idx = -1
     lon_idx = -1
 
@@ -105,7 +108,6 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
 
     # Checando latitude
     for idx, lat in enumerate(get_latitude_list()):
-        print(get_latitude_list()[idx])
         if get_latitude_list()[idx] == closest_lat:
             lat_idx = idx
             break
@@ -119,15 +121,31 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     return (lat_idx, lon_idx)
 
 
-DATA_SET_HAS_BEEN_MADE = False
+def get_wind_at(lat: float, lon: float) -> Tuple[float, float]:
+    """
+    Retorna os valores de vento de uma determinada posição
 
-# Caminho para o dataset
+    Irá levantar uma exceção caso a posição seja invalida
+    """
+    idx_lat, idx_lon = get_nearest_point_index(lat, lon)
+    if idx_lat == -1 or idx_lon == -1:
+        raise ValueError(
+            "Posição lat: ",
+            lat,
+            " lon: ",
+            lon,
+            " está fora dos limites de dados",
+            DATA_RANGE,
+        )
+
+    return (get_u10_list()[idx_lat][idx_lon], get_v10_list()[idx_lat][idx_lon])
+
+
 DATASET_PATH = "data/data.nc"
+"""Caminho para o dataset"""
 
-# Limites do dataset
+
 DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
+"""Limites do dataset"""
 
 dataset = load_data_set()
-
-
-formatted_dataset = format_dataset()

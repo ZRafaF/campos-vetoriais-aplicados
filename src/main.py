@@ -3,13 +3,13 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import windData as wd
+import configparser
 
 CONFIG_PATH = "config.ini"
 
 
-# Carrega as variáveis do arquivo "config.ini"
 def load_config_file():
-    import configparser
+    """Carrega as variáveis do arquivo 'config.ini'"""
 
     config = configparser.ConfigParser()
     config.read(CONFIG_PATH)
@@ -35,5 +35,5 @@ def load_config_file():
 
 if __name__ == "__main__":
     load_config_file()
-    # wd.print_dataset()
+    dataset = wd.get_formatted_dataset()
     input("Aperte enter para encerrar...")
