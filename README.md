@@ -21,7 +21,10 @@ Para instalar as dependências `pip install -r requirements.txt`
 ## Executar
 Para executar o arquivo inicie o *shell script* `./run.sh`
 
-## Formato dos dados
+## Utilização
+
+### Formato dos dados
+Objeto de um dado:
 ``` python
 class FormattedData:
     def __init__(self, lat: float, lon: float, u10: float, v10: float):
@@ -33,16 +36,45 @@ class FormattedData:
 
         # Componente do vento vertical em m/s
         self.v10 = v10
+```
 
-# Exemplo de uso
+Exemplo de uso
+``` python
+import windData as wd
 
 # Primeiro cria o dataset formatado
-wd.format_dataset()
-
 data_list = wd.get_formatted_dataset()
 
 for data in data_list:
     print("latitude: ", data.lat)
-
 ```
-estive aqui...
+
+### Como ler o vento de uma latitude
+
+``` python
+import windData as wd
+
+MY_LAT = 2.25
+MY_LON = -40.0
+
+my_wind = wd.get_wind_at(MY_LAT, MY_LON)
+
+print(my_wind)
+```
+
+result:
+`(-5.44604943914179, -2.6166050070843734)`
+
+
+### Principais funções
+* `get_wind_at(lat: float, lon: float)`: Retorna o valor de vento em uma determinada posição.
+> Irá levantar uma exceção caso a posição seja invalida
+
+* `get_latitude_list()`: Retorna uma lista com todas as latitudes do dataset.
+
+* `get_longitude_list()`: Retorna uma lista com todas as longitudes do dataset.
+
+* `get_formatted_dataset()`: Retorna uma lista de objetos do tipo `FormattedData`.
+
+* `print_dataset(formatted_dataset: List[FormattedData])`: Imprime na tela o dataset que for passado.
+

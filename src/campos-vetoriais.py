@@ -1,5 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import windData as wd
+
+
 
 #latitude = y
 #longitude = x
