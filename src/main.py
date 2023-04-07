@@ -2,6 +2,7 @@
 #
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
+import windData as wd
 
 CONFIG_PATH = "config.ini"
 
@@ -34,4 +35,5 @@ def load_config_file():
 
 if __name__ == "__main__":
     load_config_file()
+    wd.print_dataset()
     input("Aperte enter para encerrar...")
