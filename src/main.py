@@ -4,6 +4,7 @@
 # https://opensource.org/licenses/MIT
 import windData as wd
 import configparser
+import pathfinding as pf
 
 CONFIG_PATH = "config.ini"
 
