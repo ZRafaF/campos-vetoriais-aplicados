@@ -1,5 +1,6 @@
 import netCDF4 as nc
 from typing import List
+from tqdm import tqdm
 
 
 class FormattedData:
@@ -20,6 +21,10 @@ def get_variables() -> List[float]:
     return dataset.variables
 
 
+def get_keys():
+    return dataset.variables.keys()
+
+
 # Retorna um iterador das latitudes
 def get_latitude_list() -> List[float]:
     return dataset.variables["latitude"]
@@ -32,29 +37,33 @@ def get_longitude_list() -> List[float]:
 
 # Retorna um iterador da velocidade do vento no componente v "latitudinal"
 def get_v10_list() -> List[float]:
-    return dataset.variables["v10"][0][0]
+    return dataset.variables["v10"][0]
 
 
 # Retorna um iterador da velocidade do vento no componente u "longitudinal"
 def get_u10_list() -> List[float]:
-    return dataset.variables["u10"][0][0]
+    return dataset.variables["u10"][0]
 
 
 # Retorna uma lista de objetos do tipo FormattedData
 def get_formatted_dataset() -> List[FormattedData]:
-    lon_list = get_longitude_list()
+    print("Formatando o dataset...")
+
     u10_list = get_u10_list()
     v10_list = get_v10_list()
 
     formatted_list: List[FormattedData] = []
 
-    for idx, lat in enumerate(get_latitude_list()):
-        lon = lon_list[idx]
-        u10 = u10_list[idx]
-        v10 = v10_list[idx]
-        formatted_data = FormattedData(lat, lon, u10, v10)
-        formatted_list.append(formatted_data)
+    progress_bar = tqdm(get_latitude_list())
 
+    for idx_lat, lat in enumerate(get_latitude_list()):
+        for idx_lon, lon in enumerate(get_longitude_list()):
+            u10 = u10_list[idx_lat][idx_lon]
+            v10 = v10_list[idx_lat][idx_lon]
+            formatted_data = FormattedData(lat, lon, u10, v10)
+            formatted_list.append(formatted_data)
+        progress_bar.update(1)
+    progress_bar.close()
     return formatted_list
 
 
@@ -63,6 +72,11 @@ def print_dataset() -> None:
         print("lat: ", i.lat, " lon: ", i.lon, " u10: ", i.u10, " v10: ", i.v10)
 
 
+# Caminho para o dataset
 DATASET_PATH = "data/data.nc"
+
+# Limites do dataset
+DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
+
 dataset = load_data_set()
 formatted_dataset = get_formatted_dataset()
