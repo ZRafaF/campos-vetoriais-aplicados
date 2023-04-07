@@ -129,12 +129,6 @@ DATASET_PATH = "data/data.nc"
 DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
 
 dataset = load_data_set()
-<<<<<<< HEAD
-formatted_dataset = get_formatted_dataset()
-plt.show()
-
-=======
 
 
 formatted_dataset = format_dataset()
->>>>>>> 0457125c7a4b996e2b6d2e53acc75edd26224616
