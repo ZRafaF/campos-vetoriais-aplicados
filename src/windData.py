@@ -55,7 +55,7 @@ def get_u10_list() -> List[float]:
 
 
 # Retorna uma lista de objetos do tipo FormattedData
-def get_formatted_dataset() -> List[FormattedData]:
+def format_dataset():
     print("Formatando o dataset...")
 
     u10_list = get_u10_list()
@@ -74,6 +74,10 @@ def get_formatted_dataset() -> List[FormattedData]:
         progress_bar.update(1)
     progress_bar.close()
     return formatted_list
+
+
+def get_formatted_dataset() -> List[FormattedData]:
+    return formatted_dataset
 
 
 def print_dataset() -> None:
@@ -115,6 +119,8 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     return (lat_idx, lon_idx)
 
 
+DATA_SET_HAS_BEEN_MADE = False
+
 # Caminho para o dataset
 DATASET_PATH = "data/data.nc"
 
@@ -124,4 +130,4 @@ DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
 dataset = load_data_set()
 
 
-formatted_dataset = get_formatted_dataset()
+formatted_dataset = format_dataset()
