@@ -27,15 +27,29 @@ Para executar o arquivo inicie o *shell script* `./run.sh`
 Objeto de um dado:
 ``` python
 class FormattedData:
-    def __init__(self, lat: float, lon: float, u10: float, v10: float):
+    def __init__(
+        self,
+        lat: float,
+        lon: float,
+        u10: float = 0,
+        v10: float = 0,
+        u10n: float = 0,
+        v10n: float = 0,
+        u100: float = 0,
+        v100: float = 0,
+    ):
         self.lat = lat
         self.lon = lon
 
         # Componente do vento horizontal em m/s
-        self.u10 = u10
+        self.u10 = u10  # Componente a 10m
+        self.u10n = u10n  # Componente do vento neutro a 10m
+        self.u100 = u100  # Componente a 100m
 
         # Componente do vento vertical em m/s
-        self.v10 = v10
+        self.v10 = v10  # Componente a 10m
+        self.v10n = v10n  # Componente do vento neutro a 10m
+        self.v100 = v100  # Componente a 100m
 ```
 
 Exemplo de uso
@@ -67,7 +81,7 @@ result:
 
 
 ### Principais funções
-* `get_wind_at(lat: float, lon: float)`: Retorna o valor de vento em uma determinada posição.
+* `get_wind_at(lat: float, lon: float, height: str)`: Retorna o valor de vento em uma determinada posição.
 > Irá levantar uma exceção caso a posição seja invalida
 
 * `get_latitude_list()`: Retorna uma lista com todas as latitudes do dataset.
