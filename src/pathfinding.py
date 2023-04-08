@@ -14,17 +14,8 @@ for data in data_list:
     U.append(data.u10)
     V.append(data.v10)
 
-field1 = []
-x = 0
-for data in Y:
-    field2 = []
-    for data2 in X:
-        field2.append([U[x],V[x]])
-        x = x + 1
-    field1.append(field2)
-field = np.array(field1)
-
-field = field / np.sqrt(np.sum(field**2, axis=2, keepdims=True))
+U10 = np.array(U)
+V10 = np.array(V)
 
 def pathField(iniLat, iniLon, goalLat, goalLon):
 
@@ -43,8 +34,12 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
     # Enquanto a posição atual do agente for diferente do objetivo
     while not np.array_equal(pos, goal):
 
+        uniU = U10[int(pos[0]*len(Y)) + int(pos[1])]
+        uniV = V10[int(pos[0]*len(Y)) + int(pos[1])]
+        uniU = uniU / np.sqrt(uniU**2 + uniV**2)
+        uniV = uniV / np.sqrt(uniU**2 + uniV**2)
         # Calcula a direção do campo vetorial na posição atual
-        direction = field[int(pos[0]), int(pos[1])]
+        direction = [uniV, uniU]
 
         # Move o agente na direção do campo vetorial
         pos = np.clip(pos + direction, 0, len(Y)-1)
