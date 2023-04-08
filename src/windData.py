@@ -5,19 +5,32 @@
 import netCDF4 as nc
 from typing import List, Tuple
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 
 class FormattedData:
-    def __init__(self, lat: float, lon: float, u10: float, v10: float):
+    def __init__(
+        self,
+        lat: float,
+        lon: float,
+        u10: float = 0,
+        v10: float = 0,
+        u10n: float = 0,
+        v10n: float = 0,
+        u100: float = 0,
+        v100: float = 0,
+    ):
         self.lat = lat
         self.lon = lon
 
         # Componente do vento horizontal em m/s
-        self.u10 = u10
+        self.u10 = u10  # Componente a 10m
+        self.u10n = u10n  # Componente do vento neutro a 10m
+        self.u100 = u100  # Componente a 100m
 
         # Componente do vento vertical em m/s
-        self.v10 = v10
+        self.v10 = v10  # Componente a 10m
+        self.v10n = v10n  # Componente do vento neutro a 10m
+        self.v100 = v100  # Componente a 100m
 
 
 def load_data_set() -> List[float]:
@@ -46,13 +59,33 @@ def get_longitude_list() -> List[float]:
 
 
 def get_v10_list() -> List[float]:
-    """Retorna um iterador da velocidade do vento no componente v 'latitudinal'"""
+    """Retorna um iterador da velocidade do vento no componente v10 'latitudinal'"""
     return dataset.variables["v10"][0]
 
 
 def get_u10_list() -> List[float]:
-    """Retorna um iterador da velocidade do vento no componente u 'longitudinal'"""
+    """Retorna um iterador da velocidade do vento no componente u10 'longitudinal'"""
     return dataset.variables["u10"][0]
+
+
+def get_v10n_list() -> List[float]:
+    """Retorna um iterador da velocidade do vento no componente v10n 'latitudinal'"""
+    return dataset.variables["v10n"][0]
+
+
+def get_u10n_list() -> List[float]:
+    """Retorna um iterador da velocidade do vento no componente u10n 'longitudinal'"""
+    return dataset.variables["u10n"][0]
+
+
+def get_v100_list() -> List[float]:
+    """Retorna um iterador da velocidade do vento no componente v100 'latitudinal'"""
+    return dataset.variables["v100"][0]
+
+
+def get_u100_list() -> List[float]:
+    """Retorna um iterador da velocidade do vento no componente u100 'longitudinal'"""
+    return dataset.variables["u100"][0]
 
 
 def get_formatted_dataset() -> List[FormattedData]:
@@ -60,8 +93,18 @@ def get_formatted_dataset() -> List[FormattedData]:
 
     print("Formatando o dataset...")
 
-    u10_list = get_u10_list()
-    v10_list = get_v10_list()
+    has_wind_10 = True if "u10" in get_keys() else False
+    has_wind_10n = True if "u10n" in get_keys() else False
+    has_wind_100 = True if "u100" in get_keys() else False
+
+    u10_list = get_u10_list() if has_wind_10 else None
+    v10_list = get_v10_list() if has_wind_10 else None
+
+    u10n_list = get_u10n_list() if has_wind_10n else None
+    v10n_list = get_v10n_list() if has_wind_10n else None
+
+    u100_list = get_u100_list() if has_wind_100 else None
+    v100_list = get_v100_list() if has_wind_100 else None
 
     formatted_list: List[FormattedData] = []
 
@@ -69,9 +112,16 @@ def get_formatted_dataset() -> List[FormattedData]:
 
     for idx_lat, lat in enumerate(get_latitude_list()):
         for idx_lon, lon in enumerate(get_longitude_list()):
-            u10 = u10_list[idx_lat][idx_lon]
-            v10 = v10_list[idx_lat][idx_lon]
-            formatted_data = FormattedData(lat, lon, u10, v10)
+            u10 = u10_list[idx_lat][idx_lon] if has_wind_10 else None
+            v10 = v10_list[idx_lat][idx_lon] if has_wind_10 else None
+
+            u10n = u10n_list[idx_lat][idx_lon] if has_wind_10n else None
+            v10n = v10n_list[idx_lat][idx_lon] if has_wind_10n else None
+
+            u100 = u100_list[idx_lat][idx_lon] if has_wind_100 else None
+            v100 = v100_list[idx_lat][idx_lon] if has_wind_100 else None
+
+            formatted_data = FormattedData(lat, lon, u10, v10, u10n, v10n, u100, v100)
             formatted_list.append(formatted_data)
         progress_bar.update(1)
     progress_bar.close()
@@ -122,9 +172,10 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     return (lat_idx, lon_idx)
 
 
-def get_wind_at(lat: float, lon: float) -> Tuple[float, float]:
+def get_wind_at(lat: float, lon: float, height: str = "10") -> Tuple[float, float]:
     """
-    Retorna os valores de vento de uma determinada posição
+    Retorna os valores de vento de uma determinada posição e altitude.
+    As altitudes permitidas são '10', '10n', '100'
 
     Irá levantar uma exceção caso a posição seja invalida
     """
@@ -138,11 +189,19 @@ def get_wind_at(lat: float, lon: float) -> Tuple[float, float]:
             " está fora dos limites de dados",
             DATA_RANGE,
         )
+    if height == "10":
+        return (get_u10_list()[idx_lat][idx_lon], get_v10_list()[idx_lat][idx_lon])
 
-    return (get_u10_list()[idx_lat][idx_lon], get_v10_list()[idx_lat][idx_lon])
+    if height == "10n":
+        return (get_u10n_list()[idx_lat][idx_lon], get_v10n_list()[idx_lat][idx_lon])
+
+    if height == "100":
+        return (get_u100_list()[idx_lat][idx_lon], get_v100_list()[idx_lat][idx_lon])
+
+    raise ValueError("Altitude inválida")
 
 
-DATASET_PATH = "data/data.nc"
+DATASET_PATH = "data/data_hourly.nc"
 """Caminho para o dataset"""
 
 

@@ -11,18 +11,18 @@ V = []
 for data in dataset:
     Y.append(data.lat)
     X.append(data.lon)
-    U.append(data.u10)
-    V.append(data.v10)
+    U.append(data.u100)
+    V.append(data.v100)
 
 
-#latitude = y
-#longitude = x
-#u horizontal
-#v vertical
+# latitude = y
+# longitude = x
+# u horizontal
+# v vertical
 
 
-x,y = np.meshgrid( np.linspace( -75, -32, 10), np.linspace( -35, 6, 10))
+x, y = np.meshgrid(np.linspace(-75, -32, 10), np.linspace(-35, 6, 10))
 
-plt.quiver(X,Y,U,V)
-plt.grid('on')
+plt.quiver(X, Y, U, V)
+plt.grid("on")
 plt.show()
