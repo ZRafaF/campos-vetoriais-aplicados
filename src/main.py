@@ -4,6 +4,8 @@
 # https://opensource.org/licenses/MIT
 import windData as wd
 import configparser
+import plotVectorField as pvf
+import pathfinding as pf
 
 CONFIG_PATH = "config.ini"
 
@@ -15,6 +17,7 @@ def load_config_file():
     config.read(CONFIG_PATH)
 
     # Criando uma dicionário global
+    global config_data
     config_data = {}
 
     # Pontos são guardados em uma tuple
@@ -36,4 +39,11 @@ def load_config_file():
 if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
+    path = pf.pathField(
+        config_data["point_1"][0],
+        config_data["point_1"][0],
+        config_data["point_2"][0],
+        config_data["point_2"][0],
+    )
+    pvf.plot_vector_field_and_path(dataset, path)
     input("Aperte enter para encerrar...")
