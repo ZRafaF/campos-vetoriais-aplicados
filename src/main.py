@@ -6,6 +6,7 @@ import windData as wd
 import configparser
 import plotVectorField as pvf
 import newAlgo
+import newAlgoPT
 import numpy as np
 
 CONFIG_PATH = "config.ini"

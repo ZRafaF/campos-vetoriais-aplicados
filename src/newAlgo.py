@@ -114,18 +114,44 @@ def find_path(
     print("angle: ", angle)
     matrix = []
     progress_bar = tqdm(wd.get_latitude_list())
-    for idx_lat in range(len(wd.get_latitude_list())):
+
+    search_range = 4
+    start_tuple_idx = (0, 0)
+    end_tuple_idx = (0, 0)
+    for idx_lat, lat in enumerate(wd.get_latitude_list()):
+        if (
+            lat + search_range > wd.DATA_RANGE["lat"][0]
+            or lat > start[0] + search_range
+        ):
+            continue
+        if (
+            lat + search_range < wd.DATA_RANGE["lat"][1]
+            or lat < start[0] - search_range
+        ):
+            continue
         new_row = []
-        for idx_lon in range(len(wd.get_longitude_list())):
+        for idx_lon, lon in enumerate(wd.get_longitude_list()):
+            if (
+                lon + search_range > wd.DATA_RANGE["lon"][0]
+                or lon > start[1] + search_range
+            ):
+                continue
+            if (
+                lon + search_range < wd.DATA_RANGE["lon"][1]
+                or lon < start[1] - search_range
+            ):
+                continue
             wind_at_point = wd.get_wind_by_idx(idx_lat, idx_lon, "100")
             new_row.append(calculate_cost(angle, wind_at_point[0], wind_at_point[1]))
+            if lat == start[0] and lon == start[1]:
+                start_tuple_idx = (len(new_row), len(matrix))
+            elif lat == goal[0] and lon == goal[1]:
+                end_tuple_idx = (len(new_row), len(matrix))
         matrix.append(new_row)
         progress_bar.update(1)
+    print(end_tuple_idx)
     progress_bar.close()
-
-    start_tuple_idx = wd.get_nearest_point_index(start[0], start[1])
-    end_tuple_idx = wd.get_nearest_point_index(goal[0], goal[1])
-
+    print(matrix)
     shortest_path = bellman_ford(matrix, start_tuple_idx, end_tuple_idx)
     print(shortest_path)
 
