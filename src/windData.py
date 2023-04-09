@@ -172,6 +172,20 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     return (lat_idx, lon_idx)
 
 
+def get_wind_by_idx(
+    idx_lat: int, idx_lon: int, height: str = "10"
+) -> Tuple[float, float]:
+    if height == "100":
+        return (get_u100_list()[idx_lat][idx_lon], get_v100_list()[idx_lat][idx_lon])
+    if height == "10":
+        return (get_u10_list()[idx_lat][idx_lon], get_v10_list()[idx_lat][idx_lon])
+
+    if height == "10n":
+        return (get_u10n_list()[idx_lat][idx_lon], get_v10n_list()[idx_lat][idx_lon])
+
+    raise ValueError("Altitude inválida")
+
+
 def get_wind_at(lat: float, lon: float, height: str = "10") -> Tuple[float, float]:
     """
     Retorna os valores de vento de uma determinada posição e altitude.
