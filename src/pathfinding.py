@@ -14,6 +14,8 @@ for data in data_list:
     U.append(data.u10)
     V.append(data.v10)
 
+Y = list(dict.fromkeys(Y))
+X = list(dict.fromkeys(X))
 U10 = np.array(U)
 V10 = np.array(V)
 
@@ -25,8 +27,9 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
     goalY = Y.index(goalLat)
     goalX = X.index(goalLon)
 
-    goal = np.array([iniX, iniY])
-    pos = np.array([goalX, goalY])
+    goal = np.array([goalX, goalY])
+    ini = np.array([iniX, iniY])
+    pos = np.array([iniX, iniY])
 
     # Cria um vetor com as posições do agente
     path = [pos]
@@ -40,10 +43,10 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
         uniV = uniV / np.sqrt(uniU**2 + uniV**2)
 
         # Calcula a direção do campo vetorial na posição atual
-        direction = [uniV, uniU]
+        direction = [uniU, uniV]
 
         # Move o agente na direção do campo vetorial
-        pos = np.clip(pos + direction, 0, len(Y) - 1)
+        pos = np.clip(pos + direction, ini, goal)
 
         # Adiciona a nova posição à lista de caminho percorrido
         path.append(pos)
