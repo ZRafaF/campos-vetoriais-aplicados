@@ -5,7 +5,6 @@
 import netCDF4 as nc
 from typing import List, Tuple
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 
 class FormattedData:
