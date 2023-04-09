@@ -27,8 +27,9 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
     goalY = Y.index(goalLat)
     goalX = X.index(goalLon)
 
-    goal = np.array([iniX, iniY])
-    pos = np.array([goalX, goalY])
+    goal = np.array([goalX, goalY])
+    ini = np.array([iniX, iniY])
+    pos = np.array([iniX, iniY])
 
     # Cria um vetor com as posições do agente
     path = [pos]
@@ -45,7 +46,7 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
         direction = [uniU, uniV]
 
         # Move o agente na direção do campo vetorial
-        pos = np.clip(pos + direction, 0, len(Y) - 1)
+        pos = np.clip(pos + direction, ini, goal)
 
         # Adiciona a nova posição à lista de caminho percorrido
         path.append(pos)
