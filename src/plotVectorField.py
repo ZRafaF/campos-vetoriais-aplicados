@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import windData as wd
-from typing import List
+from typing import List, Tuple
 
 
 def plot_vector_field(vector_field: List[wd.FormattedData]):
@@ -30,9 +30,9 @@ def plot_vector_field(vector_field: List[wd.FormattedData]):
 
 
 def plot_vector_field_and_path(
-    vector_field: List[wd.FormattedData], path: List[np.array]
+    vector_field: List[wd.FormattedData], path: List[Tuple[float, float]]
 ):
-    """Recebe um vector field no formato List[wd.FormattedData] e o plota"""
+    """Recebe um vector field no formato List[wd.FormattedData] e um caminho e o plota"""
     X = []
     Y = []
     U = []
@@ -53,6 +53,10 @@ def plot_vector_field_and_path(
 
     plt.quiver(X, Y, U, V)
     plt.grid("on")
-    plt.plot(path, color="r")
+    last_point = None
+    for point in path:
+        if last_point is not None:
+            plt.plot([point[1], last_point[1]], [point[0], last_point[0]], color="r")
+        last_point = point
 
     plt.show()

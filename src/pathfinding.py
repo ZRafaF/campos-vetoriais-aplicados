@@ -18,7 +18,6 @@ U10 = np.array(U)
 V10 = np.array(V)
 
 
-
 def pathField(iniLat, iniLon, goalLat, goalLon):
     iniY = Y.index(iniLat)
     iniX = X.index(iniLon)
@@ -33,9 +32,8 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
 
     # Enquanto a posição atual do agente for diferente do objetivo
     while not np.array_equal(pos, goal):
-
-        uniU = U10[int(pos[0]*len(Y)) + int(pos[1])]
-        uniV = V10[int(pos[0]*len(Y)) + int(pos[1])]
+        uniU = U10[int(pos[0]) + int(pos[1])]
+        uniV = V10[int(pos[0]) + int(pos[1])]
         uniU = uniU / np.sqrt(uniU**2 + uniV**2)
         uniV = uniV / np.sqrt(uniU**2 + uniV**2)
 

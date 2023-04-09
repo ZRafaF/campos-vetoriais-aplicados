@@ -5,7 +5,8 @@
 import windData as wd
 import configparser
 import plotVectorField as pvf
-import pathfinding as pf
+import newAlgo
+import numpy as np
 
 CONFIG_PATH = "config.ini"
 
@@ -39,11 +40,18 @@ def load_config_file():
 if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
+
+    start = (config_data["point_1"][0], config_data["point_1"][1])
+    goal = (config_data["point_2"][0], config_data["point_2"][1])
+    """
+    print(path)
     path = pf.pathField(
         config_data["point_1"][0],
-        config_data["point_1"][0],
+        config_data["point_1"][1],
         config_data["point_2"][0],
-        config_data["point_2"][0],
+        config_data["point_2"][1],
     )
-    pvf.plot_vector_field_and_path(dataset, path)
+    """
+    path = newAlgo.find_path(start, goal, dataset)
+    pvf.plot_vector_field_and_path(dataset, np.array([start, goal]))
     input("Aperte enter para encerrar...")
