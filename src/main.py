@@ -4,9 +4,9 @@
 # https://opensource.org/licenses/MIT
 import windData as wd
 import configparser
+import pathfinding_n as pf
 import plotVectorField as pvf
 import newAlgo
-import newAlgoPT
 import numpy as np
 
 CONFIG_PATH = "config.ini"
@@ -54,5 +54,8 @@ if __name__ == "__main__":
     )
     """
     path = newAlgo.find_path(start, goal, dataset)
+    # path = pf.pathField(start[0], start[1], goal[0], goal[1])
+    print(path)
     pvf.plot_vector_field_and_path(dataset, np.array([start, goal]))
+    # pvf.plot_vector_field_and_path(dataset, path)
     input("Aperte enter para encerrar...")

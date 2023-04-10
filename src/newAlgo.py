@@ -31,7 +31,6 @@ def bellman_ford(graph, start, end):
 
     for _ in range(rows * cols - 1):
         for i in range(rows):
-            print(i)
             for j in range(cols):
                 for neighbor in get_neighbors((i, j), rows, cols):
                     cost = graph[neighbor[0]][neighbor[1]]
@@ -40,7 +39,6 @@ def bellman_ford(graph, start, end):
                         parents[neighbor] = (i, j)
 
     for i in range(rows):
-        print(i)
         for j in range(cols):
             for neighbor in get_neighbors((i, j), rows, cols):
                 cost = graph[neighbor[0]][neighbor[1]]
@@ -102,7 +100,7 @@ def calculate_cost(angle: float, u: float, v: float):
     # Calculate the projection of the vector onto the line
     projection = math.cos(angle_diff * math.pi / 180) * math.sqrt(u**2 + v**2)
 
-    return round(projection * 100, 0)
+    return projection
 
 
 def find_path(
@@ -125,20 +123,26 @@ def find_path(
         ):
             continue
         if (
-            lat + search_range < wd.DATA_RANGE["lat"][1]
+            lat - search_range < wd.DATA_RANGE["lat"][1]
             or lat < start[0] - search_range
         ):
             continue
         new_row = []
         for idx_lon, lon in enumerate(wd.get_longitude_list()):
             if (
-                lon + search_range > wd.DATA_RANGE["lon"][0]
-                or lon > start[1] + search_range
+                lon - search_range > wd.DATA_RANGE["lon"][0]
+                or lon < start[1] - search_range
             ):
+                print(
+                    lon - search_range,
+                    wd.DATA_RANGE["lon"][0],
+                    lon,
+                    start[1] - search_range,
+                )
                 continue
             if (
                 lon + search_range < wd.DATA_RANGE["lon"][1]
-                or lon < start[1] - search_range
+                or lon > start[1] + search_range
             ):
                 continue
             wind_at_point = wd.get_wind_by_idx(idx_lat, idx_lon, "100")
