@@ -39,11 +39,27 @@ def load_config_file():
 if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
+
+    # Calculando caminho
     path = pf.pathField(
         config_data["point_1"][0],
         config_data["point_1"][1],
         config_data["point_2"][0],
         config_data["point_2"][1],
     )
-    pvf.plot_vector_field_and_path(dataset, path)
+
+    pvf.plot_vector_field(dataset)
+
+    # Plotando os pontos iniciais e finais e ligando eles
+    pvf.plot_path(
+        (
+            [config_data["point_1"][0], config_data["point_1"][1]],
+            [config_data["point_2"][0], config_data["point_2"][1]],
+        ),
+        color="b",
+    )
+
+    pvf.plot_path(path, "r")
+
+    pvf.show_plot()
     input("Aperte enter para encerrar...")
