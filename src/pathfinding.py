@@ -45,30 +45,30 @@ def pathField(iniLat, iniLon, goalLat, goalLon):
         # Calcula a direção do campo vetorial na posição atual
         direction = [uniU, uniV]
         
-        ant = [abs(goal[0] - pos[0]), abs(goal[1] - pos[1])]
+        ant = [abs(goal[0] - pos[0]), abs(goal[1] - pos[1]), pos[0], pos[1]]
         # Move o agente na direção do campo vetorial
         pos = np.clip(pos + direction, ini, goal)
 
         if((ant[0] <= abs(goal[0] - pos[0])) and pos[0] != goal[0]):
             if(goal[0] > pos[0]):
                 if(pos[0] + 1 < goal[0]):
-                    pos[0] = pos[0] + 1
+                    pos[0] = ant[2] + 1
                 else:
                     pos[0] = goal[0]
             else:
                 if(pos[0] - 1 > goal[0]):
-                    pos[0] = pos[0] - 1
+                    pos[0] = ant[2] - 1
                 else:
                     pos[0] = goal[0]
         if((ant[1] <= abs(goal[1] - pos[1])) and pos[1] != goal[1]):
             if(goal[1] > pos[1]):
                 if(pos[1] + 1 < goal[1]):
-                    pos[1] = pos[1] + 1
+                    pos[1] = ant[3] + 1
                 else:
                     pos[1] = goal[1]
             else:
                 if(pos[1] - 1 > goal[1]):
-                    pos[1] = pos[1] - 1
+                    pos[1] = ant[3] - 1
                 else:
                     pos[1] = goal[1]
         # Adiciona a nova posição à lista de caminho percorrido
