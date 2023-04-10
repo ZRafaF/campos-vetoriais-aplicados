@@ -53,8 +53,8 @@ if __name__ == "__main__":
     # Plotando os pontos iniciais e finais e ligando eles
     pvf.plot_path(
         (
-            [config_data["point_1"][0], config_data["point_1"][1]],
-            [config_data["point_2"][0], config_data["point_2"][1]],
+            [config_data["point_1"][1], config_data["point_1"][0]],
+            [config_data["point_2"][1], config_data["point_2"][0]],
         ),
         color="b",
     )
