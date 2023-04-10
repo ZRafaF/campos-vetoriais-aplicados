@@ -41,9 +41,9 @@ if __name__ == "__main__":
     dataset = wd.get_formatted_dataset()
     path = pf.pathField(
         config_data["point_1"][0],
-        config_data["point_1"][0],
+        config_data["point_1"][1],
         config_data["point_2"][0],
-        config_data["point_2"][0],
+        config_data["point_2"][1],
     )
     pvf.plot_vector_field_and_path(dataset, path)
     input("Aperte enter para encerrar...")
