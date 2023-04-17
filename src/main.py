@@ -42,20 +42,45 @@ if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
 
-    start = (config_data["point_1"][0], config_data["point_1"][1])
-    goal = (config_data["point_2"][0], config_data["point_2"][1])
+    pvf.plot_vector_field(dataset)
+
     """
-    print(path)
+    # Calculando caminho
     path = pf.pathField(
         config_data["point_1"][0],
         config_data["point_1"][1],
         config_data["point_2"][0],
         config_data["point_2"][1],
     )
+    
+    # Plotando os pontos iniciais e finais e ligando eles
+    pvf.plot_path(
+        (
+            [config_data["point_1"][1], config_data["point_1"][0]],
+            [config_data["point_2"][1], config_data["point_2"][0]],
+        ),
+        color="b",
+    )
     """
-    path = newAlgo.find_path(start, goal, dataset)
-    # path = pf.pathField(start[0], start[1], goal[0], goal[1])
-    print(path)
-    pvf.plot_vector_field_and_path(dataset, np.array([start, goal]))
-    # pvf.plot_vector_field_and_path(dataset, path)
+    # plot start
+    pvf.plot_point(
+        (
+            config_data["point_1"][1],
+            config_data["point_1"][0],
+        ),
+        color="b",
+    )
+
+    # plot goal
+    pvf.plot_point(
+        (
+            config_data["point_2"][1],
+            config_data["point_2"][0],
+        ),
+        color="g",
+    )
+
+    # pvf.plot_path(path, "r")
+
+    pvf.show_plot()
     input("Aperte enter para encerrar...")
