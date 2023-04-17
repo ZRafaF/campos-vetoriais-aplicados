@@ -6,8 +6,6 @@ import windData as wd
 import configparser
 import pathfinding_n as pf
 import plotVectorField as pvf
-import newAlgo
-import numpy as np
 
 CONFIG_PATH = "config.ini"
 
@@ -84,9 +82,9 @@ if __name__ == "__main__":
         color="g",
     )
 
-    path = newAlgo.find_path(start, goal, dataset)
+    # path = newAlgo.find_path(start, goal, dataset)
 
-    pvf.plot_path(path, "r")
-
+    # pvf.plot_path(path, "r")
+    weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
     pvf.show_plot()
     input("Aperte enter para encerrar...")
