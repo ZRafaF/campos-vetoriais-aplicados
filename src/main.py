@@ -5,6 +5,7 @@
 import windData as wd
 import configparser
 import pathfinding_n as pf
+import new_algo
 import plotVectorField as pvf
 
 CONFIG_PATH = "config.ini"
@@ -84,7 +85,20 @@ if __name__ == "__main__":
 
     # path = newAlgo.find_path(start, goal, dataset)
 
-    # pvf.plot_path(path, "r")
     weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
+
+    path = new_algo.dijkstra(weighted_matrix, start_idx, goal_idx)
+    print("path: ", path)
+    for point in path:
+        if point[0] >= len(wd.get_latitude_list()) or point[1] >= len(
+            wd.get_longitude_list()
+        ):
+            continue
+        lat = wd.get_latitude_list()[point[0]]
+        lon = wd.get_longitude_list()[point[1]]
+        pvf.plot_point([lat, lon], "r")
+
+    pvf.plot_heatmap(weighted_matrix)
     pvf.show_plot()
+
     input("Aperte enter para encerrar...")
