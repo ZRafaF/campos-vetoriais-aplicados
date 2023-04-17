@@ -4,8 +4,8 @@
 # https://opensource.org/licenses/MIT
 import windData as wd
 import configparser
+import pathfinding_n as pf
 import plotVectorField as pvf
-import pathfinding as pf
 
 CONFIG_PATH = "config.ini"
 
@@ -40,6 +40,9 @@ if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
 
+    pvf.plot_vector_field(dataset)
+
+    """
     # Calculando caminho
     path = pf.pathField(
         config_data["point_1"][0],
@@ -47,9 +50,7 @@ if __name__ == "__main__":
         config_data["point_2"][0],
         config_data["point_2"][1],
     )
-
-    pvf.plot_vector_field(dataset)
-
+    
     # Plotando os pontos iniciais e finais e ligando eles
     pvf.plot_path(
         (
@@ -58,8 +59,32 @@ if __name__ == "__main__":
         ),
         color="b",
     )
+    """
+    start = (
+        config_data["point_1"][1],
+        config_data["point_1"][0],
+    )
 
-    pvf.plot_path(path, "r")
+    goal = (
+        config_data["point_2"][1],
+        config_data["point_2"][0],
+    )
 
+    # plot start
+    pvf.plot_point(
+        start,
+        color="b",
+    )
+
+    # plot goal
+    pvf.plot_point(
+        goal,
+        color="g",
+    )
+
+    # path = newAlgo.find_path(start, goal, dataset)
+
+    # pvf.plot_path(path, "r")
+    weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
     pvf.show_plot()
     input("Aperte enter para encerrar...")

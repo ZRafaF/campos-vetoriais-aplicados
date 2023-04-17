@@ -3,8 +3,9 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import netCDF4 as nc
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from tqdm import tqdm
+import math
 
 
 class FormattedData:
@@ -140,6 +141,27 @@ def __round_num(num: float) -> float:
     return num - remaining
 
 
+def __get_data_range() -> Dict[int, int]:
+    """Retorna um dicionário com os limites do dataset"""
+    return {
+        "lat": (
+            get_latitude_list()[0],
+            get_latitude_list()[len(get_latitude_list()) - 1],
+        ),
+        "lon": (
+            get_longitude_list()[0],
+            get_longitude_list()[len(get_longitude_list()) - 1],
+        ),
+    }
+
+
+def find_angle(x1, y1, x2, y2):
+    angle = math.atan2(y2 - y1, x2 - x1) * 180 / math.pi
+    if angle < 0:
+        angle += 360
+    return angle
+
+
 def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     """
     Retorna uma Tuple dos índices dos pontos mais próximos
@@ -172,6 +194,20 @@ def get_nearest_point_index(lat: float, lon: float) -> Tuple[float, float]:
     return (lat_idx, lon_idx)
 
 
+def get_wind_by_idx(
+    idx_lat: int, idx_lon: int, height: str = "10"
+) -> Tuple[float, float]:
+    if height == "100":
+        return (get_u100_list()[idx_lat][idx_lon], get_v100_list()[idx_lat][idx_lon])
+    if height == "10":
+        return (get_u10_list()[idx_lat][idx_lon], get_v10_list()[idx_lat][idx_lon])
+
+    if height == "10n":
+        return (get_u10n_list()[idx_lat][idx_lon], get_v10n_list()[idx_lat][idx_lon])
+
+    raise ValueError("Altitude inválida")
+
+
 def get_wind_at(lat: float, lon: float, height: str = "10") -> Tuple[float, float]:
     """
     Retorna os valores de vento de uma determinada posição e altitude.
@@ -201,11 +237,65 @@ def get_wind_at(lat: float, lon: float, height: str = "10") -> Tuple[float, floa
     raise ValueError("Altitude inválida")
 
 
-DATASET_PATH = "data/data_hourly.nc"
-"""Caminho para o dataset"""
+def calculate_cost(angle: float, u: float, v: float):
+    angle += 90
+    # Calculate the angle of the vector relative to the x-axis
+    vector_angle = math.atan2(v, u) * 180 / math.pi
+
+    # Calculate the angle between the vector and the line
+    angle_diff = angle - vector_angle
+
+    # Calculate the projection of the vector onto the line
+    projection = math.cos(angle_diff * math.pi / 180) * math.sqrt(u**2 + v**2)
+
+    return projection
 
 
-DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
-"""Limites do dataset"""
+def make_weighted_matrix(
+    start: Tuple[float, float], goal: Tuple[float, float], height: str = "10"
+) -> Tuple[List[List[float]], Tuple[int, int], Tuple[int, int]]:
+    """
+    Recebe um ponto inicial e final.
+
+    Retorna:
+        - Matriz de pesos
+        - Tuple com o índice do ponto inicial
+        - Tuple com o índice do ponto final
+    """
+    print("Criando matriz de pesos...")
+
+    angle = find_angle(start[0], start[1], goal[0], goal[1])
+    matrix = []
+    progress_bar = tqdm(get_latitude_list())
+
+    start_tuple_idx = (0, 0)
+    end_tuple_idx = (0, 0)
+    for idx_lat, lat in enumerate(get_latitude_list()):
+        new_row = []
+        for idx_lon, lon in enumerate(get_longitude_list()):
+            wind_at_point = get_wind_by_idx(idx_lat, idx_lon, height)
+            new_row.append(calculate_cost(angle, wind_at_point[0], wind_at_point[1]))
+            if lat == start[0] and lon == start[1]:
+                start_tuple_idx = (len(new_row), len(matrix))
+            elif lat == goal[0] and lon == goal[1]:
+                end_tuple_idx = (len(new_row), len(matrix))
+        matrix.append(new_row)
+        progress_bar.update(1)
+    progress_bar.close()
+    return (matrix, start_tuple_idx, end_tuple_idx)
+
+
+DATASET_PATH = "data/n6s0w0e1.nc"
+"""
+    Caminho para o dataset
+
+    Disponíveis na pasta /data/...
+"""
+
 
 dataset = load_data_set()
+
+DATA_RANGE = __get_data_range()
+"""Limites do dataset"""
+
+print(DATA_RANGE)

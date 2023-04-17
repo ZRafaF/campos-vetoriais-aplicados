@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import windData as wd
 from typing import List, Tuple
+from typing import List, Tuple
 
 
 def plot_vector_field(vector_field: List[wd.FormattedData]):
@@ -13,8 +14,8 @@ def plot_vector_field(vector_field: List[wd.FormattedData]):
     for data in vector_field:
         Y.append(data.lat)
         X.append(data.lon)
-        U.append(data.u10)
-        V.append(data.v10)
+        U.append(data.u100)
+        V.append(data.v100)
 
     # latitude = y
     # longitude = x
@@ -35,6 +36,10 @@ def plot_path(path: List[Tuple[float, float]], color: str = "r"):
         if last_point is not None:
             plt.plot([point[0], last_point[0]], [point[1], last_point[1]], color=color)
         last_point = point
+
+
+def plot_point(point: Tuple[float, float], color: str = "r"):
+    plt.plot(point[0], point[1], color=color, marker="o", markersize=3)
 
 
 def show_plot():
