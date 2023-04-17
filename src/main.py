@@ -62,25 +62,31 @@ if __name__ == "__main__":
         color="b",
     )
     """
+    start = (
+        config_data["point_1"][1],
+        config_data["point_1"][0],
+    )
+
+    goal = (
+        config_data["point_2"][1],
+        config_data["point_2"][0],
+    )
+
     # plot start
     pvf.plot_point(
-        (
-            config_data["point_1"][1],
-            config_data["point_1"][0],
-        ),
+        start,
         color="b",
     )
 
     # plot goal
     pvf.plot_point(
-        (
-            config_data["point_2"][1],
-            config_data["point_2"][0],
-        ),
+        goal,
         color="g",
     )
 
-    # pvf.plot_path(path, "r")
+    path = newAlgo.find_path(start, goal, dataset)
+
+    pvf.plot_path(path, "r")
 
     pvf.show_plot()
     input("Aperte enter para encerrar...")

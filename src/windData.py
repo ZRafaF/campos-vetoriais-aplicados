@@ -215,11 +215,21 @@ def get_wind_at(lat: float, lon: float, height: str = "10") -> Tuple[float, floa
     raise ValueError("Altitude inválida")
 
 
-DATASET_PATH = "data/data_hourly.nc"
-"""Caminho para o dataset"""
+DATASET_PATH = "data/n6s0w0e1.nc"
+"""
+    Caminho para o dataset
 
+    Disponíveis na pasta /data/...
+"""
 
-DATA_RANGE = {"lat": (6, -35), "lon": (-75, -32)}
-"""Limites do dataset"""
 
 dataset = load_data_set()
+
+DATA_RANGE = {
+    "lat": (get_latitude_list()[0], get_latitude_list()[len(get_latitude_list()) - 1]),
+    "lon": (
+        get_longitude_list()[0],
+        get_longitude_list()[len(get_longitude_list()) - 1],
+    ),
+}
+"""Limites do dataset"""
