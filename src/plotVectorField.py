@@ -34,12 +34,12 @@ def plot_path(path: List[Tuple[float, float]], color: str = "r"):
     last_point = None
     for point in path:
         if last_point is not None:
-            plt.plot([point[0], last_point[0]], [point[1], last_point[1]], color=color)
+            plt.plot([point[1], last_point[1]], [point[0], last_point[0]], color=color)
         last_point = point
 
 
 def plot_point(point: Tuple[float, float], color: str = "r"):
-    plt.plot(point[0], point[1], color=color, marker="o", markersize=3)
+    plt.plot(point[1], point[0], color=color, marker="o", markersize=3)
 
 
 def show_plot():

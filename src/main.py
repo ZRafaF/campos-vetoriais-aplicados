@@ -7,6 +7,7 @@ import configparser
 import pathfinding_n as pf
 import plotVectorField as pvf
 import networkx as nx
+import pandas as pd
 
 
 CONFIG_PATH = "config.ini"
@@ -43,20 +44,20 @@ if __name__ == "__main__":
     dataset = wd.get_formatted_dataset()
 
     start = (
-        config_data["point_1"][1],
         config_data["point_1"][0],
+        config_data["point_1"][1],
     )
 
     goal = (
-        config_data["point_2"][1],
         config_data["point_2"][0],
+        config_data["point_2"][1],
     )
 
     # path = newAlgo.find_path(start, goal, dataset)
 
     # weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
 
-    graph = wd.make_graph()
+    graph = wd.load_data_frame()
 
     G = nx.from_pandas_edgelist(
         graph, source="source", target="target", edge_attr="weight"
@@ -64,12 +65,13 @@ if __name__ == "__main__":
 
     start_lat_idx, start_lon_idx = wd.get_nearest_point_index(start[0], start[1])
     goal_lat_idx, goal_lon_idx = wd.get_nearest_point_index(goal[0], goal[1])
+    print(start, goal)
     path = nx.shortest_path(
         G,
         source=wd.get_1d_from_2d(start_lat_idx, start_lon_idx),
         target=wd.get_1d_from_2d(goal_lat_idx, goal_lon_idx),
         weight="weight",
-        method="bellman-ford",
+        method="dijkstra",
     )
 
     """
