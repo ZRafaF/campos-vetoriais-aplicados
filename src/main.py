@@ -51,6 +51,10 @@ def get_start_goal() -> tuple:
     return (start, goal)
 
 
+def get_radius() -> float:
+    return config_data["radius"]
+
+
 if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
@@ -61,7 +65,9 @@ if __name__ == "__main__":
 
     G = study.get_G(graph)
 
-    path = study.get_shortest_path(G, start, goal)
+    # path = study.get_shortest_path(G, start, goal)
+
+    path = study.get_shortest_path_in_radius(start, get_radius(), G)
 
     pvf.plot_vector_field(dataset)
     path_2d = study.get_path_2d_from_1d(path)

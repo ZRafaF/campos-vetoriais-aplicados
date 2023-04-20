@@ -6,6 +6,8 @@ import networkx as nx
 import windData as wd
 from typing import Tuple
 import pandas as pd
+import math
+from tqdm import tqdm
 
 
 def get_G(graph: pd.DataFrame) -> any:
@@ -75,3 +77,71 @@ def get_path_2d_cost(path_2d: list) -> float:
             total_cost += cost
         last_point = point
     return total_cost
+
+
+def get_shortest_path_in_radius(start: tuple, radius: float, G: any) -> list:
+    "Radius in km"
+    all_paths_2d_cost = []
+    progress_bar = tqdm(range(36))
+
+    for angle in range(36):
+        goal = get_new_latitude_longitude(start[0], start[1], radius, angle * 10)
+        path = get_shortest_path(G, start, goal)
+        path_2d = get_path_2d_from_1d(path)
+        cost = get_path_2d_cost(path_2d)
+        all_paths_2d_cost.append({"path": path, "cost": cost})
+        progress_bar.update(1)
+
+    lowest_cost = math.inf
+    lowest_cost_idx = 0
+    for idx, path_2d_cost in enumerate(all_paths_2d_cost):
+        if path_2d_cost["cost"] < lowest_cost:
+            lowest_cost = path_2d_cost["cost"]
+            lowest_cost_idx = idx
+    progress_bar.close()
+
+    return all_paths_2d_cost[lowest_cost_idx]["path"]
+
+
+def get_new_latitude_longitude(
+    lat: float, lon: float, radius_in_km: float, angle_in_degrees: float
+) -> Tuple[float, float]:
+    """
+    Returns new latitude and longitude coordinates based on the given parameters.
+
+    Args:
+    lat (float): The latitude coordinate in degrees.
+    lon (float): The longitude coordinate in degrees.
+    radius_in_km (float): The radius in kilometers.
+    angle_in_degrees (float): The angle in degrees.
+
+    Returns:
+    A tuple containing the new latitude and longitude coordinates.
+    """
+    # Convert latitude, longitude, and angle to radians
+    lat_radians = math.radians(lat)
+    lon_radians = math.radians(lon)
+    angle_radians = math.radians(angle_in_degrees)
+
+    # Calculate the new latitude and longitude using the Haversine formula
+    earth_radius = 6371  # in kilometers
+    new_lat = math.asin(
+        math.sin(lat_radians) * math.cos(radius_in_km / earth_radius)
+        + math.cos(lat_radians)
+        * math.sin(radius_in_km / earth_radius)
+        * math.cos(angle_radians)
+    )
+    new_lon = lon_radians + math.atan2(
+        math.sin(angle_radians)
+        * math.sin(radius_in_km / earth_radius)
+        * math.cos(lat_radians),
+        math.cos(radius_in_km / earth_radius)
+        - math.sin(lat_radians) * math.sin(new_lat),
+    )
+
+    # Convert the new latitude and longitude back to degrees
+    new_lat = math.degrees(new_lat)
+    new_lon = math.degrees(new_lon)
+
+    # Return the new latitude and longitude as a tuple
+    return (new_lat, new_lon)
