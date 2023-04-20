@@ -5,9 +5,7 @@
 import windData as wd
 import configparser
 import pathfinding_n as pf
-import new_algo
 import plotVectorField as pvf
-import pandas as pd
 import networkx as nx
 
 
@@ -74,8 +72,6 @@ if __name__ == "__main__":
         method="bellman-ford",
     )
 
-    print("path: ", path)
-
     """
     
     pos = nx.spring_layout(G)
@@ -85,11 +81,13 @@ if __name__ == "__main__":
     nx.draw(G, pos=pos, with_labels=True, node_size=2, )
     """
 
+    """
     for point_1d in path:
         point = wd.get_2d_from_1d(point_1d)
-        lat = wd.get_latitude_list()[point[0]]
-        lon = wd.get_longitude_list()[point[1]]
-        pvf.plot_point([lon, lat], "r")
+        lat = wd.get_latitude_list()[point[1]]
+        lon = wd.get_longitude_list()[point[0]]
+        pvf.plot_point([lat, lon], "r")
+    """
 
     # pvf.plot_heatmap(weighted_matrix)
     pvf.plot_vector_field(dataset)
@@ -105,6 +103,16 @@ if __name__ == "__main__":
         goal,
         color="g",
     )
+
+    def get_lat_lon_from_1d(idx_1d):
+        point = wd.get_2d_from_1d(idx_1d)
+        lat = wd.get_latitude_list()[point[1]]
+        lon = wd.get_longitude_list()[point[0]]
+        return (lat, lon)
+
+    path_2d = list(map(lambda x: get_lat_lon_from_1d(x), path))
+    pvf.plot_path(path_2d)
+
     pvf.show_plot()
 
     input("Aperte enter para encerrar...")
