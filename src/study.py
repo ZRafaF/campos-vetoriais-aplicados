@@ -4,9 +4,10 @@
 # https://opensource.org/licenses/MIT
 import networkx as nx
 import windData as wd
-from typing import Tuple
+from typing import Tuple, List
 import pandas as pd
 import math
+import plotVectorField as pvf
 from tqdm import tqdm
 
 
@@ -202,3 +203,74 @@ def get_new_latitude_longitude(
 
     # Return the new latitude and longitude as a tuple
     return (new_lat, new_lon)
+
+
+# Define a function to study the radius around a starting point
+def radius_study(start: Tuple[float], radius: float):
+    # Print message indicating that the radius study is starting
+    print("Iniciando estudo de raio")
+
+    # Get the dataset and graph data
+    dataset = get_dataset()
+    graph = wd.load_data_frame()
+
+    # Use the graph data to create a networkx graph object
+    G = get_G(graph)
+
+    # Find the shortest path within the given radius around the starting point
+    path = get_shortest_path_in_radius(start, radius, G)
+
+    # Plot the radius and vector field
+    pvf.plot_radius(start, radius)
+    pvf.plot_vector_field(dataset)
+
+    # Convert the path from 1D to 2D and plot it
+    path_2d = get_path_2d_from_1d(path)
+    pvf.plot_path_smooth(path_2d)
+
+
+# Define a function to get the dataset
+def get_dataset() -> List[wd.FormattedData]:
+    # Use the global variable DATASET if it has already been defined
+    global DATASET
+    if DATASET == None:
+        # Otherwise, load the formatted dataset
+        DATASET = wd.get_formatted_dataset()
+    return DATASET
+
+
+# Define a function to study the path from point A to point B
+def a_to_b_study(start: Tuple[float], goal: Tuple[float]):
+    # Print message indicating that the A to B study is starting
+    print("Iniciando estudo de ponto A a B")
+
+    # Get the dataset and graph data
+    dataset = get_dataset()
+    graph = wd.load_data_frame()
+
+    # Use the graph data to create a networkx graph object
+    G = get_G(graph)
+
+    # Find the shortest path between the starting and goal points
+    print("Procurando o melhor caminho...")
+    path = get_shortest_path(G, start, goal)
+
+    # Plot the vector field
+    pvf.plot_vector_field(dataset)
+
+    # Convert the path from 1D to 2D and plot it
+    path_2d = get_path_2d_from_1d(path)
+    pvf.plot_path_smooth(path_2d)
+
+
+# Define a function to study the heatmap of edge weights between two points
+def weights_heatmap_study(start: Tuple[float], goal: Tuple[float]):
+    # Create a weighted matrix using the start and goal coordinates
+    weighted_matrix, _, _ = wd.make_weighted_matrix(start, goal)
+
+    # Plot the heatmap of edge weights between the starting and goal points
+    pvf.plot_heatmap(weighted_matrix)
+
+
+# Define a global variable to store the dataset
+DATASET = None

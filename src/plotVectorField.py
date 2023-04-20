@@ -83,7 +83,7 @@ def plot_path_smooth(path: List[Tuple[float, float]], color: str = "r"):
 
     # Use the splines to create a smooth path with 100 points
     alpha = np.linspace(0, 1, 100)
-    points_fitted = np.vstack(spl(alpha) for spl in splines).T
+    points_fitted = np.vstack([spl(alpha) for spl in splines]).T
 
     # Plot the smooth path using Matplotlib
     plt.plot(*points_fitted.T, color=color)
@@ -105,8 +105,7 @@ def show_plot():
 
 def plot_heatmap(matrix):
     """Plot a heatmap using Matplotlib"""
-    plt.figure(2)
-    plt.imshow(matrix, cmap="hot", interpolation="nearest")
+    plt.imshow(matrix, cmap="viridis", interpolation="nearest")
 
 
 def draw_graph(G):
@@ -123,12 +122,5 @@ def draw_graph(G):
         node_size=2,
         width=list(weights),
     )
+
     plt.show()
-
-
-def draw_weighted_matrix(start, goal):
-    """Draw a weighted matrix using Matplotlib and weighted_distances library"""
-    # Create a weighted matrix using the start and goal coordinates
-    weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
-    # Plot the weighted matrix using Matplotlib
-    plot_heatmap(weighted_matrix)
