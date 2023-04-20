@@ -4,11 +4,9 @@
 # https://opensource.org/licenses/MIT
 import windData as wd
 import configparser
-import pathfinding_n as pf
 import plotVectorField as pvf
 import networkx as nx
-import pandas as pd
-
+import matplotlib as plt
 
 CONFIG_PATH = "config.ini"
 
@@ -39,6 +37,25 @@ def load_config_file():
     """
 
 
+def draw_graph(G):
+    weights_raw = list(nx.get_edge_attributes(G, "weight").values())
+    weights = [(x - 9999) / 10 for x in weights_raw]
+
+    nx.draw(
+        G,
+        pos=nx.spring_layout(G),
+        with_labels=False,
+        node_size=2,
+        width=list(weights),
+    )
+    plt.show()
+
+
+def draw_weighted_matrix(start, goal):
+    weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
+    pvf.plot_heatmap(weighted_matrix)
+
+
 if __name__ == "__main__":
     load_config_file()
     dataset = wd.get_formatted_dataset()
@@ -53,19 +70,17 @@ if __name__ == "__main__":
         config_data["point_2"][1],
     )
 
-    # path = newAlgo.find_path(start, goal, dataset)
-
-    # weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
-
     graph = wd.load_data_frame()
-
+    print(graph)
     G = nx.from_pandas_edgelist(
         graph, source="source", target="target", edge_attr="weight"
     )
 
+    # draw_graph(G)
+
     start_lat_idx, start_lon_idx = wd.get_nearest_point_index(start[0], start[1])
     goal_lat_idx, goal_lon_idx = wd.get_nearest_point_index(goal[0], goal[1])
-    print(start, goal)
+
     path = nx.shortest_path(
         G,
         source=wd.get_1d_from_2d(start_lat_idx, start_lon_idx),
@@ -74,24 +89,17 @@ if __name__ == "__main__":
         method="dijkstra",
     )
 
+    # Para mais info https://networkx.guide/algorithms/shortest-path/
     """
-    
-    pos = nx.spring_layout(G)
-    weights = nx.get_edge_attributes(G, "weight").values()
-
-    nx.draw(G, pos=pos, with_labels=True, node_size=2, width=list(weights))
-    nx.draw(G, pos=pos, with_labels=True, node_size=2, )
-    """
-
-    """
-    for point_1d in path:
-        point = wd.get_2d_from_1d(point_1d)
-        lat = wd.get_latitude_list()[point[1]]
-        lon = wd.get_longitude_list()[point[0]]
-        pvf.plot_point([lat, lon], "r")
+ 
+    path = nx.astar_path(
+        G,
+        source=wd.get_1d_from_2d(start_lat_idx, start_lon_idx),
+        target=wd.get_1d_from_2d(goal_lat_idx, goal_lon_idx),
+        weight="weight",
+    )
     """
 
-    # pvf.plot_heatmap(weighted_matrix)
     pvf.plot_vector_field(dataset)
 
     # plot start
@@ -113,7 +121,10 @@ if __name__ == "__main__":
         return (lat, lon)
 
     path_2d = list(map(lambda x: get_lat_lon_from_1d(x), path))
+
     pvf.plot_path(path_2d)
+
+    # draw_weighted_matrix(start, goal)
 
     pvf.show_plot()
 
