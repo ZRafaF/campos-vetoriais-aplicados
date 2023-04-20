@@ -7,6 +7,7 @@ import configparser
 import plotVectorField as pvf
 import networkx as nx
 import matplotlib as plt
+import study
 
 CONFIG_PATH = "config.ini"
 
@@ -37,29 +38,7 @@ def load_config_file():
     """
 
 
-def draw_graph(G):
-    weights_raw = list(nx.get_edge_attributes(G, "weight").values())
-    weights = [(x - 9999) / 10 for x in weights_raw]
-
-    nx.draw(
-        G,
-        pos=nx.spring_layout(G),
-        with_labels=False,
-        node_size=2,
-        width=list(weights),
-    )
-    plt.show()
-
-
-def draw_weighted_matrix(start, goal):
-    weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
-    pvf.plot_heatmap(weighted_matrix)
-
-
-if __name__ == "__main__":
-    load_config_file()
-    dataset = wd.get_formatted_dataset()
-
+def get_start_goal() -> tuple:
     start = (
         config_data["point_1"][0],
         config_data["point_1"][1],
@@ -69,62 +48,34 @@ if __name__ == "__main__":
         config_data["point_2"][0],
         config_data["point_2"][1],
     )
+    return (start, goal)
+
+
+def get_radius() -> float:
+    return config_data["radius"]
+
+
+if __name__ == "__main__":
+    load_config_file()
+    dataset = wd.get_formatted_dataset()
+
+    start, goal = get_start_goal()
 
     graph = wd.load_data_frame()
-    print(graph)
-    G = nx.from_pandas_edgelist(
-        graph, source="source", target="target", edge_attr="weight"
-    )
 
-    # draw_graph(G)
+    G = study.get_G(graph)
 
-    start_lat_idx, start_lon_idx = wd.get_nearest_point_index(start[0], start[1])
-    goal_lat_idx, goal_lon_idx = wd.get_nearest_point_index(goal[0], goal[1])
+    # path = study.get_shortest_path(G, start, goal)
 
-    path = nx.shortest_path(
-        G,
-        source=wd.get_1d_from_2d(start_lat_idx, start_lon_idx),
-        target=wd.get_1d_from_2d(goal_lat_idx, goal_lon_idx),
-        weight="weight",
-        method="dijkstra",
-    )
-
-    # Para mais info https://networkx.guide/algorithms/shortest-path/
-    """
- 
-    path = nx.astar_path(
-        G,
-        source=wd.get_1d_from_2d(start_lat_idx, start_lon_idx),
-        target=wd.get_1d_from_2d(goal_lat_idx, goal_lon_idx),
-        weight="weight",
-    )
-    """
-
+    path = study.get_shortest_path_in_radius(start, get_radius(), G)
+    pvf.plot_radius(start, get_radius())
     pvf.plot_vector_field(dataset)
 
-    # plot start
-    pvf.plot_point(
-        start,
-        color="b",
-    )
+    path_2d = study.get_path_2d_from_1d(path)
 
-    # plot goal
-    pvf.plot_point(
-        goal,
-        color="g",
-    )
+    print(study.get_path_2d_cost(path_2d))
 
-    def get_lat_lon_from_1d(idx_1d):
-        point = wd.get_2d_from_1d(idx_1d)
-        lat = wd.get_latitude_list()[point[1]]
-        lon = wd.get_longitude_list()[point[0]]
-        return (lat, lon)
-
-    path_2d = list(map(lambda x: get_lat_lon_from_1d(x), path))
-
-    pvf.plot_path(path_2d)
-
-    # draw_weighted_matrix(start, goal)
+    pvf.plot_path_smooth(path_2d)
 
     pvf.show_plot()
 
