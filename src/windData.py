@@ -307,15 +307,23 @@ def calculate_cost_positive(angle: float, u: float, v: float):
     # Calculate the projection of the vector onto the line
     projection = math.cos(angle_diff * math.pi / 180) * math.sqrt(u**2 + v**2)
 
-    return abs(projection + 9999)
+    return abs(projection + WIND_OFFSET)
 
 
-def calculate_cost_between_points(
-    start_lat: int, start_lon: int, goal_lat: int, goal_lon: int
+def calculate_positive_cost_between_points(
+    start_lat: float, start_lon: float, goal_lat: float, goal_lon: float
 ) -> float:
     goal_u, goal_v = get_wind_at(goal_lat, goal_lon)
     angle = find_angle(start_lat, start_lon, goal_lat, goal_lon)
     return calculate_cost_positive(angle, goal_u, goal_v)
+
+
+def calculate_cost_between_points(
+    start_lat: float, start_lon: float, goal_lat: float, goal_lon: float
+) -> float:
+    goal_u, goal_v = get_wind_at(goal_lat, goal_lon)
+    angle = find_angle(start_lat, start_lon, goal_lat, goal_lon)
+    return calculate_cost(angle, goal_u, goal_v)
 
 
 def make_data_frame() -> pd.DataFrame:
@@ -345,7 +353,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -360,7 +368,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -375,7 +383,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -390,7 +398,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -405,7 +413,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -420,7 +428,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -435,7 +443,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -450,7 +458,7 @@ def make_data_frame() -> pd.DataFrame:
                 g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
 
                 g_weight.append(
-                    calculate_cost_between_points(
+                    calculate_positive_cost_between_points(
                         lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
                     )
                 )
@@ -495,5 +503,7 @@ dataset = load_data_set()
 
 DATA_RANGE = __get_data_range()
 """Limites do dataset"""
+
+WIND_OFFSET = 9999
 
 print("Data range: ", DATA_RANGE)

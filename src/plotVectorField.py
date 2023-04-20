@@ -4,6 +4,7 @@ from typing import List, Tuple
 from typing import List, Tuple
 import numpy as np
 from scipy.interpolate import UnivariateSpline
+import networkx as nx
 
 
 def plot_vector_field(vector_field: List[wd.FormattedData]):
@@ -33,7 +34,16 @@ def plot_vector_field(vector_field: List[wd.FormattedData]):
 
 def plot_path(path: List[Tuple[float, float]], color: str = "r"):
     """Recebe um caminho e o plota"""
-    SMOOTH = 1.8
+    last_point = None
+    for point in path:
+        if last_point is not None:
+            plt.plot([point[1], last_point[1]], [point[0], last_point[0]], color=color)
+        last_point = point
+
+
+def plot_path_smooth(path: List[Tuple[float, float]], color: str = "r"):
+    """Recebe um caminho, interpola e o plota"""
+    SMOOTH = 0.4
     points = np.array(path)
 
     distance = np.cumsum(np.sqrt(np.sum(np.diff(points, axis=0) ** 2, axis=1)))
@@ -45,15 +55,6 @@ def plot_path(path: List[Tuple[float, float]], color: str = "r"):
     points_fitted = np.vstack(spl(alpha) for spl in splines).T
 
     plt.plot(*points_fitted.T, color=color)
-
-    return
-    """
-    last_point = None
-    for point in path:
-        if last_point is not None:
-            plt.plot([point[1], last_point[1]], [point[0], last_point[0]], color=color)
-        last_point = point
-    """
 
 
 def plot_point(point: Tuple[float, float], color: str = "r"):
@@ -68,3 +69,22 @@ def plot_heatmap(matrix):
     plt.figure(2)
 
     plt.imshow(matrix, cmap="hot", interpolation="nearest")
+
+
+def draw_graph(G):
+    weights_raw = list(nx.get_edge_attributes(G, "weight").values())
+    weights = [(x - wd.WIND_OFFSET) / 10 for x in weights_raw]
+
+    nx.draw(
+        G,
+        pos=nx.spring_layout(G),
+        with_labels=False,
+        node_size=2,
+        width=list(weights),
+    )
+    plt.show()
+
+
+def draw_weighted_matrix(start, goal):
+    weighted_matrix, start_idx, goal_idx = wd.make_weighted_matrix(start, goal)
+    plot_heatmap(weighted_matrix)
