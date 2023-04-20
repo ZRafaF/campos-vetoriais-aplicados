@@ -44,3 +44,9 @@ def plot_point(point: Tuple[float, float], color: str = "r"):
 
 def show_plot():
     plt.show()
+
+
+def plot_heatmap(matrix):
+    plt.figure(2)
+
+    plt.imshow(matrix, cmap="hot", interpolation="nearest")

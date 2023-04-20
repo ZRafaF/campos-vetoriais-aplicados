@@ -6,6 +6,7 @@ import netCDF4 as nc
 from typing import List, Tuple, Dict
 from tqdm import tqdm
 import math
+import pandas as pd
 
 
 class FormattedData:
@@ -283,6 +284,181 @@ def make_weighted_matrix(
         progress_bar.update(1)
     progress_bar.close()
     return (matrix, start_tuple_idx, end_tuple_idx)
+
+
+def get_1d_from_2d(x: int, y: int) -> int:
+    return y * len(get_latitude_list()) + x
+
+
+def get_2d_from_1d(idx: int) -> Tuple[int, int]:
+    lat_size = len(get_latitude_list())
+    return (idx // lat_size, idx % lat_size)
+
+
+def calculate_cost_positive(angle: float, u: float, v: float):
+    angle += 90
+    # Calculate the angle of the vector relative to the x-axis
+    vector_angle = math.atan2(v, u) * 180 / math.pi
+
+    # Calculate the angle between the vector and the line
+    angle_diff = angle - vector_angle
+
+    # Calculate the projection of the vector onto the line
+    projection = math.cos(angle_diff * math.pi / 180) * math.sqrt(u**2 + v**2)
+
+    return abs(projection + 9999)
+
+
+def calculate_cost_between_points(
+    start_lat: int, start_lon: int, goal_lat: int, goal_lon: int
+) -> float:
+    goal_u, goal_v = get_wind_at(goal_lat, goal_lon)
+    angle = find_angle(start_lat, start_lon, goal_lat, goal_lon)
+    return calculate_cost_positive(angle, goal_u, goal_v)
+
+
+def make_graph() -> pd.DataFrame:
+    """
+    Falta fazer as diagonais
+    """
+    g_source = []
+    g_target = []
+    g_weight = []
+
+    lat_list = get_latitude_list()
+    lon_list = get_longitude_list()
+
+    num_of_row = len(lat_list)
+    num_of_col = len(lon_list)
+
+    progress_bar = tqdm(get_latitude_list())
+
+    for lat_idx, lat in enumerate(lat_list):
+        for lon_idx, lon in enumerate(lon_list):
+            idx_1d = get_1d_from_2d(lon_idx, lat_idx)
+            # Get top neighbor
+            if lat_idx > 0:
+                other_lat_idx = lat_idx - 1
+                other_lon_idx = lon_idx
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get down neighbor
+            if lat_idx < num_of_row - 1:
+                other_lat_idx = lat_idx + 1
+                other_lon_idx = lon_idx
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get left neighbor
+            if lon_idx > 0:
+                other_lat_idx = lat_idx
+                other_lon_idx = lon_idx - 1
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get right neighbor
+            if lon_idx < num_of_col - 1:
+                other_lat_idx = lat_idx
+                other_lon_idx = lon_idx + 1
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get top-left neighbor
+            if lat_idx > 0 and lon_idx > 0:
+                other_lat_idx = lat_idx - 1
+                other_lon_idx = lon_idx - 1
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get down-left neighbor
+            if lat_idx < num_of_row - 1 and lon_idx > 0:
+                other_lat_idx = lat_idx + 1
+                other_lon_idx = lon_idx - 1
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get top-right neighbor
+            if lat_idx > 0 and lon_idx < num_of_col - 1:
+                other_lat_idx = lat_idx - 1
+                other_lon_idx = lon_idx + 1
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+
+            # Get down-right neighbor
+            if lat_idx < num_of_row - 1 and lon_idx < num_of_col - 1:
+                other_lat_idx = lat_idx + 1
+                other_lon_idx = lon_idx + 1
+
+                g_source.append(idx_1d)
+
+                g_target.append(get_1d_from_2d(other_lon_idx, other_lat_idx))
+
+                g_weight.append(
+                    calculate_cost_between_points(
+                        lat, lon, lat_list[other_lat_idx], lon_list[other_lon_idx]
+                    )
+                )
+        progress_bar.update(1)
+    progress_bar.close()
+
+    return pd.DataFrame({"source": g_source, "target": g_target, "weight": g_weight})
 
 
 DATASET_PATH = "data/n6s0w0e1.nc"
