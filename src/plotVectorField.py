@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import windData as wd
 from typing import List, Tuple
 from typing import List, Tuple
+import numpy as np
+from scipy.interpolate import UnivariateSpline
 
 
 def plot_vector_field(vector_field: List[wd.FormattedData]):
@@ -31,11 +33,27 @@ def plot_vector_field(vector_field: List[wd.FormattedData]):
 
 def plot_path(path: List[Tuple[float, float]], color: str = "r"):
     """Recebe um caminho e o plota"""
+    SMOOTH = 1.8
+    points = np.array(path)
+
+    distance = np.cumsum(np.sqrt(np.sum(np.diff(points, axis=0) ** 2, axis=1)))
+    distance = np.insert(distance, 0, 0) / distance[-1]
+
+    splines = [UnivariateSpline(distance, coords, k=3, s=SMOOTH) for coords in points.T]
+
+    alpha = np.linspace(0, 1, 100)
+    points_fitted = np.vstack(spl(alpha) for spl in splines).T
+
+    plt.plot(*points_fitted.T, color=color)
+
+    return
+    """
     last_point = None
     for point in path:
         if last_point is not None:
             plt.plot([point[1], last_point[1]], [point[0], last_point[0]], color=color)
         last_point = point
+    """
 
 
 def plot_point(point: Tuple[float, float], color: str = "r"):

@@ -118,10 +118,10 @@ if __name__ == "__main__":
         point = wd.get_2d_from_1d(idx_1d)
         lat = wd.get_latitude_list()[point[1]]
         lon = wd.get_longitude_list()[point[0]]
-        return (lat, lon)
+        return (lon, lat)
 
     path_2d = list(map(lambda x: get_lat_lon_from_1d(x), path))
-
+    print(path_2d)
     pvf.plot_path(path_2d)
 
     # draw_weighted_matrix(start, goal)
