@@ -3,3 +3,6 @@ matplotlib
 netCDF4
 tqdm
 numpy
+pandas
+networkx
+scipy
