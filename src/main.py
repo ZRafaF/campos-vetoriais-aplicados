@@ -68,19 +68,14 @@ if __name__ == "__main__":
     # path = study.get_shortest_path(G, start, goal)
 
     path = study.get_shortest_path_in_radius(start, get_radius(), G)
-
+    pvf.plot_radius(start, get_radius())
     pvf.plot_vector_field(dataset)
+
     path_2d = study.get_path_2d_from_1d(path)
 
     print(study.get_path_2d_cost(path_2d))
 
     pvf.plot_path_smooth(path_2d)
-
-    # plot start
-    pvf.plot_point(start, "b")
-
-    # plot goal
-    pvf.plot_point(goal, "g")
 
     pvf.show_plot()
 
