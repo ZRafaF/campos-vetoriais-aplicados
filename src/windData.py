@@ -7,6 +7,7 @@ from typing import List, Tuple, Dict
 from tqdm import tqdm
 import math
 import pandas as pd
+import os.path
 
 
 class FormattedData:
@@ -317,10 +318,8 @@ def calculate_cost_between_points(
     return calculate_cost_positive(angle, goal_u, goal_v)
 
 
-def make_graph() -> pd.DataFrame:
-    """
-    Falta fazer as diagonais
-    """
+def make_data_frame() -> pd.DataFrame:
+    """ """
     g_source = []
     g_target = []
     g_weight = []
@@ -458,17 +457,40 @@ def make_graph() -> pd.DataFrame:
         progress_bar.update(1)
     progress_bar.close()
 
-    return pd.DataFrame({"source": g_source, "target": g_target, "weight": g_weight})
+    data_frame = pd.DataFrame(
+        {"source": g_source, "target": g_target, "weight": g_weight}
+    )
+    data_frame.to_pickle(DATA_FRAME_PATH)
+
+    return data_frame
 
 
-DATASET_PATH = "data/n6s0w0e1.nc"
+def load_data_frame() -> pd.DataFrame:
+    if os.path.isfile(DATA_FRAME_PATH):
+        return pd.read_pickle(DATA_FRAME_PATH)
+    print("Data frame não encontrado, criando um novo...")
+
+    response = input(
+        "Essa ação pode demorar bastante, pressione 's' para continuar, ou qualquer outra tecla para sair \n"
+    )
+
+    if response != "s":
+        print("Encerrando...")
+        quit()
+    return make_data_frame()
+
+
+DATASET_PATH = "data/data.nc"
 """
     Caminho para o dataset
 
     Disponíveis na pasta /data/...
 """
 
-
+DATA_FRAME_PATH = "data/dataframe.pkl"
+"""
+    Caminho para o data frame
+"""
 dataset = load_data_set()
 
 DATA_RANGE = __get_data_range()
