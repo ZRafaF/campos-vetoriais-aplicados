@@ -487,7 +487,7 @@ DATASET_PATH = "data/data.nc"
     Disponíveis na pasta /data/...
 """
 
-DATA_FRAME_PATH = "data/dataframe.pkl"
+DATA_FRAME_PATH = "data/dataframe_data.pkl"
 """
     Caminho para o data frame
 """
@@ -496,4 +496,4 @@ dataset = load_data_set()
 DATA_RANGE = __get_data_range()
 """Limites do dataset"""
 
-print(DATA_RANGE)
+print("Data range: ", DATA_RANGE)
