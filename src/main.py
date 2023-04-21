@@ -32,7 +32,7 @@ def get_start_goal_radius() -> tuple:
 if __name__ == "__main__":
     start, goal, radius = get_start_goal_radius()
 
-    study.a_to_b_study(start, goal)
+    # study.a_to_b_study(start, goal)
     study.radius_study(start, radius)
     # study.weights_heatmap_study(start, goal)
 

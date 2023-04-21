@@ -149,7 +149,7 @@ def get_shortest_path_in_radius(start: tuple, radius: float, G: any) -> list:
         except:
             pass
     # Find the path with the lowest cost.
-    lowest_cost = math.inf
+    lowest_cost = 0
     lowest_cost_idx = 0
     for idx, path_2d_cost in enumerate(all_paths_2d_cost):
         if path_2d_cost["cost"] < lowest_cost:
@@ -222,7 +222,7 @@ def radius_study(start: Tuple[float], radius: float):
 
     # Plot the radius and vector field
     pvf.plot_radius(start, radius)
-    pvf.plot_vector_field(dataset)
+    pvf.plot_vector_field(dataset, scale=5)
 
     # Convert the path from 1D to 2D and plot it
     path_2d = get_path_2d_from_1d(path)
@@ -239,6 +239,49 @@ def get_dataset() -> List[wd.FormattedData]:
     return DATASET
 
 
+def get_path_2d_length(path_2d: list) -> float:
+    """
+    Calculate the total cost of a path in km.
+
+    Args:
+        path_2d (list): A list of (longitude, latitude) coordinates representing a path.
+
+    Returns:
+        float: The total cost of the path in km.
+    """
+    last_point = None
+    total_length: float = 0
+    for point in path_2d:
+        if last_point is not None:
+            # Calculate the cost between the current point and the previous point
+            length = distance(last_point[1], last_point[0], point[1], point[0])
+            total_length += length
+        last_point = point
+    return total_length
+
+
+def distance(lat1, lon1, lat2, lon2):
+    # approximate radius of earth in km
+    R = 6373.0
+
+    # convert decimal degrees to radians
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+    # calculate the differences between the latitudes and longitudes
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # calculate the distance using the Haversine formula
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance_km = R * c
+
+    return distance_km
+
+
 # Define a function to study the path from point A to point B
 def a_to_b_study(start: Tuple[float], goal: Tuple[float]):
     # Print message indicating that the A to B study is starting
@@ -248,6 +291,8 @@ def a_to_b_study(start: Tuple[float], goal: Tuple[float]):
     dataset = get_dataset()
     graph = wd.load_data_frame()
 
+    print(graph)
+
     # Use the graph data to create a networkx graph object
     G = get_G(graph)
 
@@ -256,11 +301,15 @@ def a_to_b_study(start: Tuple[float], goal: Tuple[float]):
     path = get_shortest_path(G, start, goal)
 
     # Plot the vector field
-    pvf.plot_vector_field(dataset)
+    pvf.plot_vector_field(dataset, scale=1.0)
 
     # Convert the path from 1D to 2D and plot it
     path_2d = get_path_2d_from_1d(path)
     pvf.plot_path_smooth(path_2d)
+
+    # Print the cost and distance
+    print("Custo: ", get_path_2d_cost(path_2d))
+    print("Distancia: ", get_path_2d_length(path_2d))
 
 
 # Define a function to study the heatmap of edge weights between two points
