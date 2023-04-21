@@ -6,7 +6,7 @@ from scipy.interpolate import UnivariateSpline
 import networkx as nx
 
 
-def plot_vector_field(vector_field: List[wd.FormattedData]):
+def plot_vector_field(vector_field: List[wd.FormattedData], scale: float = 1):
     """Receives a vector field in the format List[wd.FormattedData] and plots it"""
     X = []
     Y = []
@@ -20,7 +20,7 @@ def plot_vector_field(vector_field: List[wd.FormattedData]):
         V.append(data.v100)
 
     # Create a quiver plot of the vector field
-    plt.quiver(X, Y, U, V)
+    plt.quiver(X, Y, U, V, scale=(700 / scale))
     plt.grid("on")
 
 
